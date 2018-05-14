@@ -368,6 +368,95 @@ var Files = map[string]string{
 </div>
 `,
 
+	"codewalk2.html": `<!--
+	Copyright 2010 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+
+<style type='text/css'>@import "/doc/codewalk/codewalk.css";</style>
+<script type="text/javascript" src="/doc/codewalk/codewalk.js"></script>
+
+{{with .PDoc}}
+    {{if $.IsMain}}
+      {{/* command documentation */}}
+      {{comment_html .Doc}}
+    {{else}}
+      {{/* package documentation */}}
+      <div id="short-nav">
+        <dl>
+        <dd><code>import "{{html .ImportPath}}"</code></dd>
+        </dl>
+        <dl>
+          <dd><a href="#pkg-overview" class="overviewLink">Overview</a></dd>
+          <dd><a href="#pkg-index" class="indexLink">Index</a></dd>
+            {{/* if len codewalk? */}}
+
+        </dl>
+      </div>
+      <!-- The package's Name is printed as title by the top-level template -->
+      <div id="pkg-overview" class="toggleVisible">
+        <div class="collapsed">
+          <h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+        </div>
+        <div class="expanded">
+          <h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+          {{comment_html .Doc}}
+        </div>
+      </div>
+    {{end}}
+{{end}}
+{{ range $ := .Codewalks }}
+<div id="codewalk-main">
+  <div class="left" id="code-column">
+    <div id='sizer'></div>
+    <div id="code-area">
+      <div id="code-header" align="center">
+        <a id="code-popout-link" href="" target="_blank">
+          <img title="View code in new window" alt="Pop Out Code" src="/doc/codewalk/popout.png" style="display: block; float: right;"/>
+        </a>
+        <select id="code-selector">
+          {{range .File}}
+          <option value="/doc/codewalk/?fileprint=/{{urlquery .}}">{{html .}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div id="code">
+        <iframe class="code-display" name="code-display" id="code-display"></iframe>
+      </div>
+    </div>
+    <div id="code-options" class="setting">
+      <span>code on <a id="set-code-left" class="selected" href="#">left</a> &bull; <a id="set-code-right" href="#">right</a></span>
+      <span>code width <span id="code-column-width">70%</span></span>
+      <span>filepaths <a id="show-filepaths" class="selected" href="#">shown</a> &bull; <a id="hide-filepaths" href="#">hidden</a></span>
+    </div>
+  </div>
+  <div class="right" id="comment-column">
+    <div id="comment-area">
+      {{range .Step}}
+      <div class="comment first last">
+        <a class="comment-link" href="/doc/codewalk/?fileprint=/{{urlquery .File}}&amp;lo={{urlquery .Lo}}&amp;hi={{urlquery .Hi}}#mark" target="code-display"></a>
+        <div class="comment-title">{{html .Title}}</div>
+        <div class="comment-text">
+	{{with .Err}}
+	ERROR LOADING FILE: {{html .}}<br/><br/>
+	{{end}}
+        {{.XML}}
+        </div>
+        <div class="comment-text file-name"><span class="path-file">{{html .}}</span></div>
+      </div>
+      {{end}}
+    </div>
+    <div id="comment-options" class="setting">
+      <a id="prev-comment" href="#"><span class="hotkey">p</span>revious step</a>
+      &bull;
+      <a id="next-comment" href="#"><span class="hotkey">n</span>ext step</a>
+    </div>
+  </div>
+</div>
+
+{{end}}`,
+
 	"codewalkdir.html": `<!--
 	Copyright 2010 The Go Authors. All rights reserved.
 	Use of this source code is governed by a BSD-style

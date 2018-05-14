@@ -20,12 +20,14 @@ type SearchResultFunc func(p *Presentation, result SearchResult) []byte
 type Presentation struct {
 	Corpus *Corpus
 
-	mux        *http.ServeMux
-	fileServer http.Handler
-	cmdHandler handlerServer
-	pkgHandler handlerServer
+	mux             *http.ServeMux
+	fileServer      http.Handler
+	cmdHandler      handlerServer
+	pkgHandler      handlerServer
+	codewalkHandler handlerServer
 
 	CallGraphHTML,
+	CodewalkHTML,
 	DirlistHTML,
 	ErrorHTML,
 	ExampleHTML,
@@ -130,10 +132,18 @@ func NewPresentation(c *Corpus) *Presentation {
 		pattern:     "/pkg/",
 		stripPrefix: "pkg/",
 		fsRoot:      "/src",
-		exclude:     []string{"/src/cmd"},
+		exclude:     []string{"/src/cmd", "/src/codewalk"},
+	}
+	p.codewalkHandler = handlerServer{
+		p:           p,
+		c:           c,
+		pattern:     "/codewalk/",
+		stripPrefix: "codewalk/",
+		fsRoot:      "/src",
 	}
 	p.cmdHandler.registerWithMux(p.mux)
 	p.pkgHandler.registerWithMux(p.mux)
+	p.codewalkHandler.registerWithMux(p.mux)
 	p.mux.HandleFunc("/", p.ServeFile)
 	p.mux.HandleFunc("/search", p.HandleSearch)
 	p.mux.HandleFunc("/opensearch.xml", p.serveSearchDesc)

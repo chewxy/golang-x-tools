@@ -31,6 +31,10 @@ import (
 	"unicode/utf8"
 )
 
+func init() {
+	log.Printf("THIS IS CHEWXY'S VERSION1")
+}
+
 // Fake relative package path for built-ins. Documentation for all globals
 // (not just exported ones) will be shown for packages in this directory.
 const builtinPkgPath = "builtin"
@@ -436,6 +440,7 @@ type PageInfo struct {
 	Examples   []*doc.Example         // nil if no example code
 	Notes      map[string][]*doc.Note // nil if no package Notes
 	PAst       map[string]*ast.File   // nil if no AST with package exports
+	Codewalks  []*Codewalk            // nil if no code walks
 	IsMain     bool                   // true for package main
 	IsFiltered bool                   // true if results were filtered
 

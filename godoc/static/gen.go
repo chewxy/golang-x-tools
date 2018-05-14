@@ -34,6 +34,7 @@ var files = []string{
 	"analysis/typeinfo-src.png",
 	"callgraph.html",
 	"codewalk.html",
+	"codewalk2.html",
 	"codewalkdir.html",
 	"dirlist.html",
 	"error.html",

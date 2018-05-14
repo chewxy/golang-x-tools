@@ -115,6 +115,22 @@ func (h *handlerServer) GetPageInfo(abspath, relpath string, mode PageInfoMode, 
 		pkgfiles = pkginfo.IgnoredGoFiles
 	}
 
+	// fs does not have a Glob method in the interface, hence this
+	dirFiles, err := h.c.fs.ReadDir(abspath)
+	if err != nil {
+		info.Err = err
+		return info
+	}
+	for _, file := range dirFiles {
+		name := file.Name()
+		if name == "codewalk.xml" || (strings.HasPrefix(name, "codewalk_") && strings.HasSuffix(name, ".xml")) {
+			if cw, err := loadCodewalk(h.c.fs, abspath, name); err == nil {
+				info.Codewalks = append(info.Codewalks, cw)
+			}
+		}
+	}
+	log.Printf("CODEWALKS %d", len(info.Codewalks))
+
 	// get package information, if any
 	if len(pkgfiles) > 0 {
 		// build package AST
@@ -257,6 +273,7 @@ func (h *handlerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	abspath := pathpkg.Join(h.fsRoot, relpath)
+
 	mode := h.p.GetPageInfoMode(r)
 	if relpath == builtinPkgPath {
 		mode = NoFiltering | NoTypeAssoc
@@ -321,12 +338,19 @@ func (h *handlerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	info.GoogleCN = googleCN(r)
+	log.Printf("info.Dirname %q | %q", info.Dirname, r.URL.Path)
 	var body []byte
-	if info.Dirname == "/src" {
+
+	switch {
+	case info.Dirname == "/src":
 		body = applyTemplate(h.p.PackageRootHTML, "packageRootHTML", info)
-	} else {
+	case strings.HasPrefix(r.URL.Path, "/codewalk/"):
+		log.Printf("Using codewalkHTML")
+		body = applyTemplate(h.p.CodewalkHTML, "codewalkHTML", info)
+	default:
 		body = applyTemplate(h.p.PackageHTML, "packageHTML", info)
 	}
+
 	h.p.ServePage(w, Page{
 		Title:    title,
 		Tabtitle: tabtitle,

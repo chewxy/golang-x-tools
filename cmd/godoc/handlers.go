@@ -113,6 +113,7 @@ func readTemplates(p *godoc.Presentation, html bool) {
 		codewalkHTML = readTemplate("codewalk.html")
 		codewalkdirHTML = readTemplate("codewalkdir.html")
 		p.CallGraphHTML = readTemplate("callgraph.html")
+		p.CodewalkHTML = readTemplate("codewalk2.html")
 		p.DirlistHTML = readTemplate("dirlist.html")
 		p.ErrorHTML = readTemplate("error.html")
 		p.ExampleHTML = readTemplate("example.html")
